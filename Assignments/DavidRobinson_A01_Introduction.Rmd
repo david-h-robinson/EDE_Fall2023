@@ -40,21 +40,24 @@ Enter answers to the questions just below the >Answer: prompt.
 1. What are your previous experiences with data analytics, R, and Git? Include both formal and informal training.
 
 > Answer: 
+Formal training includes some undergraduate coursework in statistics (we used R) and computer science (we used Python). I also have five years of work experience in consulting -- we mostly used Excel, but also some Tableau and SQL (a long time ago) for data analytics. Informal training includes work experience in consulting per above (thinking of "on the job" training here). I have no formal or informal training in Git.
 
 2. Are there any components of the course about which you feel confident?
 
 > Answer: 
+On the "4-Data Wrangling" component, I have a decent bit of experience with these concepts in Excel (but not in R).
 
 3. Are there any components of the course about which you feel apprehensive?
 
 > Answer: 
-
+Git is brand new for me, as is Time Series Analysis, Spatial Analysis, and Data Scraping.
 
 ## 3) GitHub
 
 Provide a link below to your forked course repository in GitHub. Make sure you have pulled all recent changes from the course repository and that you have updated your course README file, committed those changes, and pushed them to your GitHub account. 
 
 > Answer: 
+https://github.com/david-h-robinson/EDE_Fall2023
 
 ## 4) Knitting
 When you have completed this document, click the `knit` button.This should produce a PDF copy of your markdown document. Submit this PDF to Sakai. 

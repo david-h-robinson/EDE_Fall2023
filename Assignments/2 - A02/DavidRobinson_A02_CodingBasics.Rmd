@@ -38,8 +38,13 @@ sequence_1To30 <- seq(1,30,3)
 
 #2. 
 
+#Assigning the mean of the sequence to a variable name.
 mean_sequence1To30 <- mean(sequence_1To30)
+
+#Assigning the median of the sequence to a variable name.
 median_sequence1To30 <- median(sequence_1To30)
+
+#Showing the variables in the console to check outputs.
 mean_sequence1To30
 median_sequence1To30
 

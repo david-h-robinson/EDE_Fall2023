@@ -34,11 +34,14 @@ This exercise accompanies the lessons in Environmental Data Analytics on coding 
 #1. 
 #Note that this sequence stops at 28 instead of 30 because adding 3 to 28 would result in 31.
 seq(1,30,3)
+sequence_1To30 <- seq(1,30,3)
 
 #2. 
-sequence_1To30 <- seq(1,30,3)
+
 mean_sequence1To30 <- mean(sequence_1To30)
 median_sequence1To30 <- median(sequence_1To30)
+mean_sequence1To30
+median_sequence1To30
 
 #3. 
 #Asking R to determine whether the mean is greater than the median via Boolean logic.
@@ -84,7 +87,7 @@ Matrices can only contain a single class of data, while data frames can consist 
 ```{r if / else function for vector of test scores}
 
 evaluateScores <- function(x){
-  evaluationX <- ifelse(x>50,TRUE,FALSE)
+  evaluationX <- ifelse(x>=50,TRUE,FALSE)
   print(evaluationX)
 }
 

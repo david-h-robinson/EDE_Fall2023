@@ -89,10 +89,10 @@ evaluateScores <- function(x){
 }
 
 #For reviewer / TA -- note that the code below is just reference for Question #12.
-evaluateScores2 <- function(y){
-  evaluationY <- if(y>50) TRUE else FALSE
-  print(evaluationY)
-}
+# 'evaluateScores2 <- function(y){
+ # 'evaluationY <- if(y>50) TRUE else FALSE
+  # 'print(evaluationY)
+# '}
 
   
 ```
@@ -108,7 +108,7 @@ evaluateScoresFrom5 <- evaluateScores(TestScores)
 evaluateScoresFrom5
 
 #For reviewer / TA -- note that the code below is just reference for Question #12.
-evaluateScores2(TestScores)
+# 'evaluateScores2(TestScores)
 
 ```
 

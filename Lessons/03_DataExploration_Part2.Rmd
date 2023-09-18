@@ -14,12 +14,13 @@ Why is data exploration our first step in analyzing a dataset? What information 
 getwd()
 
 # 2. Load packages
+#install.packages("tidyverse")
 library(tidyverse)
 
 # 3. Import datasets
 USGS.flow.data <- read.csv("./Data/Processed/USGS_Site02085000_Flow_Processed.csv",stringsAsFactors = T)
 
-#View(USGS.flow.data)
+View(USGS.flow.data)
 # Alternate option: click on data frame in Environment tab
 
 colnames(USGS.flow.data)

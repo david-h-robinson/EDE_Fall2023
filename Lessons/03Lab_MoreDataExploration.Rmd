@@ -43,15 +43,15 @@ vector3
 vector1[3] # 
 
 # Matrices ----
-matrix1 <- matrix(1:20, nrow = 5,ncol = 4) # 
+matrix1 <- matrix(1:20, nrow = 5,ncol = 4) #this is default to fill by column
 matrix1
-matrix2 <- matrix(1:20, nrow = 5, ncol = 4, byrow = TRUE) #
+matrix2 <- matrix(1:20, nrow = 5, ncol = 4, byrow = TRUE) #this fills by row
 matrix2
 matrix3 <- matrix(1:20, nrow = 5, ncol = 4, byrow = TRUE, # return after comma continues the line
                   dimnames = list(c("uno", "dos", "tres", "quatro", "cinco"), 
                                   c("un", "deux", "trois", "quatre"))) #
 
-matrix1[4, ] #
+matrix1[4, ] #this will return row 4, all elements
 matrix1[ , 3] #
 matrix1[c(12, 14)] #
 matrix1[c(12:14)] #
@@ -79,6 +79,10 @@ dataframe1[1:2,] #
 dataframe1[c("ID","Passed")] # 
 dataframe1$ID
 
+#data frames and matrices show up as data
+#variables and vectors show up as values
+#functions show up as functions
+
 ```
 
 Question: How do the different types of data appear in the Environment tab?
@@ -94,6 +98,10 @@ Question: In the R chunk below, write "dataframe1\$". Press `tab` after you type
 Find a ten-day forecast of temperatures (Fahrenheit) for Durham, North Carolina. Create two vectors, one representing the high temperature on each of the ten days and one representing the low.
 
 ```{r DataExercise-1a}
+tenDayForecastHigh <- c(80,81,82,81,78,72,77,80,80,80)
+tenDayForecastLow <- c(56,60,60,61,61,61,62,64,60,60)
+tenDayForecastHigh
+tenDayForecastLow
 
 ```
 
@@ -101,17 +109,36 @@ Now, create two additional vectors that include the ten-day forecast for the hig
 
 ```{r DataExercise-1b}
 
+convert.F.to.C <- function(x){
+  convertedTemps <- (x-32)*5/9
+  print(convertedTemps)
+
+  }
+
+convert.F.to.C(tenDayForecastHigh)
+convert.F.to.C(tenDayForecastLow)
+
+#I did it like the above, Luana did as below -- didn't need a function
+
+high_C <- (tenDayForecastHigh - 32) * 5/9
+low_C <- (tenDayForecastLow - 32) * 5/9
+
 ```
 
 Combine your four vectors into a data frame and add informative column names.
 
 ```{r DataExercise-1c}
 
+df_temp <- data.frame(tenDayForecastHigh,tenDayForecastLow,high_C,low_C)
+
 ```
 
 Use the common functions `summary` and `sd` to obtain basic data summaries of the ten-day forecast. How would you call these functions differently for the entire data frame vs. a single column? Attempt to demonstrate both options below.
 
 ```{r DataExercise-1d}
+summary(df_temp)
+#sd(df_temp) #this will not work on the given data type
+sd(df_temp$tenDayForecastHigh)
 
 ```
 
@@ -160,6 +187,11 @@ date_obj_today
 str_juneteenth <- "19 June 1865"
 #Since the format is month-day-year we will use function mdy()
 #date_juneteenth <- ()
+date_obj_juneteenth <- dmy(str_juneteenth)
+date_obj_juneteenth
+
+#it will always print in the year, month, date format by default
+
 #date_juneteenth
 ```
 
@@ -184,7 +216,7 @@ fixed_date_obj_past
 #Fix for century issue
 str_past <- "55-feb-3"
 #Alternative 1
-date_obj_past <- fast_strptime(str_past,"%y-%b-%d",cutoff_2000=23L)
+date_obj_past <- fast_strptime(str_past,"%y-%b-%d",cutoff_2000=23L) #this would change to 24L once we hit 2024
 date_obj_past
 
 #Alternative 2

@@ -156,6 +156,7 @@ Interpret this graph. What are the most common test locations, and do they diffe
 ggplot(Neonics, aes(x = Endpoint)) +
   geom_bar() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+#QUESTION -- is this syntax correct with aes inside of ggplot?
 
 ```
 
@@ -167,34 +168,59 @@ Per ECOTOX_CodeAppendix... "NOEL" is defined as "No-observable-effect-level: hig
 
 12. Determine the class of collectDate. Is it a date? If not, change to a date and confirm the new class of the variable. Using the `unique` function, determine which dates litter was sampled in August 2018.
 
-```{r}
+```{r determine class of collectDate}
+
+class(Litter$collectDate) #The class of collectDate is a factor.
+Litter$collectDate <- as.Date(Litter$collectDate, format = "%Y-%m-%d") #The class of collectDate is now a date.
+class(Litter$collectDate) #The class of collectDate is confirmed as a date.
+unique(Litter$collectDate) #Litter was sampled on the 2nd and the 30th of August 2018.
+
 
 ```
 
 13. Using the `unique` function, determine how many plots were sampled at Niwot Ridge. How is the information obtained from `unique` different from that obtained from `summary`?
 
-```{r}
+```{r determine how many plots were sampled at Niwot Ridge}
+
+unique(Litter$plotID)
+summary(Litter$plotID)
 
 ```
 
 > Answer:
+12 plots were sampled at Niwot Ridge. The 'unique' function provides a list of the unique values within a set and tells us how many levels there are. The 'summary' function provides a count of the frequency of each of those unique values within a set.
 
 14. Create a bar graph of functionalGroup counts. This shows you what type of litter is collected at the Niwot Ridge sites. Notice that litter types are fairly equally distributed across the Niwot Ridge sites.
 
-```{r}
+```{r create bar graph of functionalGroup counts}
+
+ggplot(Litter, aes(x = functionalGroup)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+#QUESTION -- is this syntax correct with aes inside of ggplot?
 
 ```
 
 15. Using `geom_boxplot` and `geom_violin`, create a boxplot and a violin plot of dryMass by functionalGroup.
 
-```{r}
+```{r create boxplot and violin plot of dryMass by functionalGroup}
+
+ggplot(Litter) +
+  geom_boxplot(aes(x = dryMass, y = functionalGroup))
+
+ggplot(Litter) +
+  geom_violin(aes(x = dryMass, y = functionalGroup))
+    #draw_quantiles = c(0.25,0.5,0.75))
+    #QUESTION -- retain or delete this draw_quantiles? Maybe state that this is not strictly speaking necessary but nice to have?
 
 ```
 
 Why is the boxplot a more effective visualization option than the violin plot in this case?
 
 > Answer:
+A box plot allows us to look at a range of values. A violion plot allows us to see both a range of values and a distribution of values within that range. In this case, a violin plot allows us to see very little, which suggests that the distribution within the range of values is not concentrated / dense in any specific area(s). Given this feature of the data, the boxplot allows us to more clearly see the range standalone.
 
 What type(s) of litter tend to have the highest biomass at these sites?
 
 > Answer:
+Per the boxplot, Needles and Mixed litter tend to have the highest biomass. Their median biomass values are higher than the maximum value of most other litter types (except for Twigs/branches, which has a maximum biomass value that is greater than the median value for Mixed).

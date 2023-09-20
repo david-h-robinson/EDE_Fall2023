@@ -40,10 +40,10 @@ getwd()
 #Load necessary packages
 #install.packages("tidyverse")
 #QUESTION -- I don't think the below line is necessary?
-#library(tidyverse)
+library(tidyverse)
 #install.packages("lubridate")
 #QUESTION -- I don't think the below line is necessary?
-#library(lubridate)
+library(lubridate)
 
 #Upload the two datasets in question
 Neonics <- read.csv("./Data/Raw/ECOTOX_Neonicotinoids_Insects_raw.csv",

@@ -32,24 +32,16 @@ This exercise accompanies the lessons in Environmental Data Analytics on Data Ex
 
 1.  Check your working directory, load necessary packages (tidyverse, lubridate), and upload two datasets: the ECOTOX neonicotinoid dataset (ECOTOX_Neonicotinoids_Insects_raw.csv) and the Niwot Ridge NEON dataset for litter and woody debris (NEON_NIWO_Litter_massdata_2018-08_raw.csv). Name these datasets "Neonics" and "Litter", respectively. Be sure to include the subcommand to read strings in as factors.
 
-```{r R session set up,  message = FALSE}
+```{r R-session-set-up,  message = FALSE}
 
 #Check working directory
 getwd()
 
 #Load necessary packages
 #install.packages("tidyverse")
-#QUESTION -- I don't think the below line is necessary?
 library(tidyverse)
 #install.packages("lubridate")
-#QUESTION -- I don't think the below line is necessary?
 library(lubridate)
-#tinytex::install_tinytex()
-#install.packages("tinytex")
-library(tinytex)
-#QUESTION / ATTEMPTED RESOLUTION -- messing around with uninstalling and re-installing tinytex
-#install.packages("rmarkdown")
-library(rmarkdown)
 
 #Upload the two datasets in question
 Neonics <- read.csv("./Data/Raw/ECOTOX_Neonicotinoids_Insects_raw.csv",
@@ -94,7 +86,7 @@ year-round sampling (1x every 1-2 months) at evergreen sites.
 
 5.  What are the dimensions of the dataset?
 
-```{r dimensions of dataset}
+```{r dimensions-of-dataset}
 
 dim(Neonics) #Neonics has 4623 rows and 30 columns
 
@@ -102,7 +94,8 @@ dim(Neonics) #Neonics has 4623 rows and 30 columns
 
 6.  Using the `summary` function on the "Effect" column, determine the most common effects that are studied. Why might these effects specifically be of interest?
 
-```{r summary of dataset}
+```{r summary-of-dataset}
+
 summary(Neonics$Effect) #Produce summary of Effect column within Neonics data
 
 ```
@@ -113,8 +106,9 @@ summary(Neonics$Effect) #Produce summary of Effect column within Neonics data
 
 7.  Using the `summary` function, determine the six most commonly studied species in the dataset (common name). What do these species have in common, and why might they be of interest over other insects? Feel free to do a brief internet search for more information if needed.[TIP: The `sort()` command can sort the output of the summary command...]
 
-```{r most common species}
-sort(summary(Neonics$Species.Common.Name)) #Produce sorted summary of Species Common Name with Neonics data
+```{r most-common-species}
+
+sort(summary(Neonics$Species.Common.Name)) #Produce sorted summary
 
 ```
 
@@ -125,27 +119,24 @@ have a role in the pollinator ecosystem, which is of great importance for maximi
 
 8.  Concentrations are always a numeric value. What is the class of `Conc.1..Author.` column in the dataset, and why is it not numeric?
 
-```{r class of conc.1..author}
+```{r class-of-conc.1..author}
+
 class(Neonics$Conc.1..Author) #Check the class of 'Conc.1.Author'
 
 ```
 
 > Answer:
-The class is "factor." Storing these concentrations as values allows them to be interpreted in a manner like that of categorical variables versus solely as numbers.
-QUESTION -- is this correct? Is this covered in the videos somewhere? Note that some also have "/" character. The concentrations are also in different units...
-so perhaps they shouldn't be added together, averaged, etc. to prevent confusion.
-QUESTION -- Nominal?
+The class is "factor." In this column of the dataset, there are characters that
+are non-numeric such as "NA" and numbers with "/" characters. R stores these as
+values to allow them to be interpreted in a manner like that of categorical 
+variables versus solely as numbers.
+
 
 ## Explore your data graphically (Neonics)
 
 9.  Using `geom_freqpoly`, generate a plot of the number of studies conducted by publication year.
 
-```{r generate a plot of the number of studies conducted by publication year}
-
-#class(Neonics$Publication.Year)
-#Neonics$Publication.Year <- as.Date(Neonics$Publication.Year, format = )
-#QUESTION -- is this necessary? If yes, what is the proper format?
-#QUESTION -- is there any constriction here for the number of bins?
+```{r generate-plot}
 
 #Generate a plot of the number of studies conducted by publication year with 30 bins
 ggplot(Neonics) +
@@ -155,9 +146,9 @@ ggplot(Neonics) +
 
 10. Reproduce the same graph but now add a color aesthetic so that different Test.Location are displayed as different colors.
 
-```{r number of studies conducted by publication year with color}
+```{r generate-color-plot}
 
-#Generate a plot of the number of studies conducted by publication year with 30 bins and different test locations displayed as different colors
+#Generate the same plot with different test locations displayed as different colors
 ggplot(Neonics) +
   geom_freqpoly(aes(x = Publication.Year, color = Test.Location), bins = 30)
 
@@ -174,7 +165,7 @@ Field natural is more common than Lab from ~1993 - 2000, but then Lab is more co
 
 [**TIP**: Add `theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))` to the end of your plot command to rotate and align the X-axis labels...]
 
-```{r create bar graph of Endpoint counts}
+```{r create-bar-graph-of-Endpoint-counts}
 
 #Generate a bar graph of the endpoint counts
 ggplot(Neonics, aes(x = Endpoint)) +
@@ -196,10 +187,10 @@ according to author's reported statistical test."
 
 12. Determine the class of collectDate. Is it a date? If not, change to a date and confirm the new class of the variable. Using the `unique` function, determine which dates litter was sampled in August 2018.
 
-```{r determine class of collectDate}
+```{r determine-class-of-collectDate}
 
 #class(Litter$collectDate) #The class of collectDate was initially a factor
-Litter$collectDate <- as.Date(Litter$collectDate, format = "%Y-%m-%d") #The class of collectDate is now a date
+Litter$collectDate <- as.Date(Litter$collectDate, format = "%Y-%m-%d")
 class(Litter$collectDate) #The class of collectDate is confirmed as a date
 unique(Litter$collectDate) #Litter was sampled on the 2nd and the 30th of August 2018
 
@@ -208,7 +199,7 @@ unique(Litter$collectDate) #Litter was sampled on the 2nd and the 30th of August
 
 13. Using the `unique` function, determine how many plots were sampled at Niwot Ridge. How is the information obtained from `unique` different from that obtained from `summary`?
 
-```{r determine how many plots were sampled at Niwot Ridge}
+```{r determine-how-many-plots-were-sampled}
 
 unique(Litter$plotID) #Determine how many unique plots were sampled
 summary(Litter$plotID) #Produce summary of how many times each unique plot was sampled 
@@ -220,7 +211,7 @@ summary(Litter$plotID) #Produce summary of how many times each unique plot was s
 
 14. Create a bar graph of functionalGroup counts. This shows you what type of litter is collected at the Niwot Ridge sites. Notice that litter types are fairly equally distributed across the Niwot Ridge sites.
 
-```{r create bar graph of functionalGroup counts}
+```{r create-bar-graph-of-functionalGroup}
 
 #Generate a bar graph of the functional group counts
 ggplot(Litter, aes(x = functionalGroup)) +
@@ -231,7 +222,7 @@ ggplot(Litter, aes(x = functionalGroup)) +
 
 15. Using `geom_boxplot` and `geom_violin`, create a boxplot and a violin plot of dryMass by functionalGroup.
 
-```{r create boxplot and violin plot of dryMass by functionalGroup}
+```{r create-boxplot-violion-plot}
 
 #Generate a boxplot of dry mass by functional group
 ggplot(Litter) +
@@ -249,7 +240,7 @@ Why is the boxplot a more effective visualization option than the violin plot in
 A box plot allows us to look at a range of values. A violion plot allows us to
 look at both a range of values and a distribution of values within that range.
 In this case, a violin plot allows us to see very little, which suggests that
-the distribution within the range of values is not concentrated / dense in any specific area(s). Given this feature of the data, the boxplot allows us to more clearly see the range of the data standalone.
+the distribution within the range of values is not concentrated / dense in any specific area(s). Given this feature of the data, the boxplot allows us to more clearly see the range of the data standalone including quartiles and outliers.
 
 What type(s) of litter tend to have the highest biomass at these sites?
 

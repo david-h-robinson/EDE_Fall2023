@@ -44,6 +44,12 @@ library(tidyverse)
 #install.packages("lubridate")
 #QUESTION -- I don't think the below line is necessary?
 library(lubridate)
+#tinytex::install_tinytex()
+#install.packages("tinytex")
+library(tinytex)
+#QUESTION / ATTEMPTED RESOLUTION -- messing around with uninstalling and re-installing tinytex
+#install.packages("rmarkdown")
+library(rmarkdown)
 
 #Upload the two datasets in question
 Neonics <- read.csv("./Data/Raw/ECOTOX_Neonicotinoids_Insects_raw.csv",
@@ -128,12 +134,14 @@ class(Neonics$Conc.1..Author) #Check the class of 'Conc.1.Author'
 The class is "factor." Storing these concentrations as values allows them to be interpreted in a manner like that of categorical variables versus solely as numbers.
 QUESTION -- is this correct? Is this covered in the videos somewhere? Note that some also have "/" character. The concentrations are also in different units...
 so perhaps they shouldn't be added together, averaged, etc. to prevent confusion.
+QUESTION -- Nominal?
 
 ## Explore your data graphically (Neonics)
 
 9.  Using `geom_freqpoly`, generate a plot of the number of studies conducted by publication year.
 
 ```{r generate a plot of the number of studies conducted by publication year}
+
 #class(Neonics$Publication.Year)
 #Neonics$Publication.Year <- as.Date(Neonics$Publication.Year, format = )
 #QUESTION -- is this necessary? If yes, what is the proper format?

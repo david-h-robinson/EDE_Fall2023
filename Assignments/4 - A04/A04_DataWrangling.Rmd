@@ -61,7 +61,7 @@ Air_PM25_2019 <- read.csv(file = here('Data','Raw','EPAair_PM25_NC2019_raw.csv')
 
 #2 
 
-glimpse(Air.O3.2018)
+glimpse(Air_O3_2018)
 glimpse(Air_O3_2019)
 glimpse(Air_PM25_2018)
 glimpse(Air_PM25_2019)
@@ -79,16 +79,44 @@ glimpse(Air_PM25_2019)
 
 6. Save all four processed datasets in the Processed folder. Use the same file names as the raw files but replace "raw" with "processed".
 
-```{r}
+```{r 3-through-6}
 #3
 
 Air_O3_2018$Date <- as.Date(Air_O3_2018$Date, format = "%m/%d/%Y") #QUESTION -- what is the difference between doing this with lowercase versus capital case? Also, the order changes from mm/dd/yyyy to yyyy-mm-dd. Is that a problem?
 
+Air_O3_2019$Date <- as.Date(Air_O3_2019$Date, format = "%m/%d/%Y") #QUESTION -- same as above.
+
+Air_PM25_2018$Date <- as.Date(Air_PM25_2018$Date, format = "%m/%d/%Y") #QUESTION -- same as above.
+
+Air_O3_2019$Date <- as.Date(Air_O3_2019$Date, format = "%m/%d/%Y") #QUESTION -- same as above.
+
 #4
+
+Air_O3_2018_Selection1 <- select(Air_O3_2018, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+
+Air_O3_2019_Selection1 <- select(Air_O3_2019, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+
+Air_PM25_2018_Selection1 <- select(Air_PM25_2018, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+
+Air_PM25_2019_Selection1 <- select(Air_PM25_2019, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 
 #5
 
+#QUESTION -- presumably this applies to the previously identified "selection" datasets?
+
+Air_PM25_2018_Selection1_replaced <- mutate(Air_PM25_2018_Selection1, AQS_PARAMETER_DESC = "PM2.5")
+
+Air_PM25_2019_Selection1_replaced <- mutate(Air_PM25_2019_Selection1, AQS_PARAMETER_DESC = "PM2.5")
+
 #6
+
+write.csv(Air_O3_2018_Selection1, row.names = FALSE, file = here('Data','Processed','Air_O3_2018_processed'))
+
+write.csv(Air_O3_2019_Selection1, row.names = FALSE, file = here('Data','Processed','Air_O3_2019_processed'))
+
+write.csv(Air_PM25_2018_Selection1_replaced, row.names = FALSE, file = here('Data','Processed','Air_PM25_2018_processed'))
+
+write.csv(Air_PM25_2019_Selection1_replaced, row.names = FALSE, file = here('Data','Processed','Air_PM25_2019_processed'))
 
 ```
 
@@ -113,10 +141,39 @@ Air_O3_2018$Date <- as.Date(Air_O3_2018$Date, format = "%m/%d/%Y") #QUESTION -- 
 
 11. Save your processed dataset with the following file name: "EPAair_O3_PM25_NC1819_Processed.csv"
 
-```{r}
+```{r 7-through-11}
 #7 
 
+#QUESTION -- presumably this applies to the four processed data sets?
+
+Air_Bind <- rbind(Air_O3_2018_Selection1, Air_O3_2019_Selection1, Air_PM25_2018_Selection1_replaced, Air_PM25_2019_Selection1_replaced)
+
 #8 
+
+Air_Bind_8 <- Air_Bind %>%
+  drop_na(Site.Name) %>% #QUESTION -- drop_na() vs droplevels()?
+  #QUESTION -- did not use 'intersect'?
+  filter(Site.Name == "Linville Falls" |
+           Site.Name == "Durham Armory" |
+           Site.Name == "Leggett" |
+           Site.Name == "Hattie Avenue" |
+           Site.Name == "Clemmons Middle" |
+           Site.Name == "Mendenhall School" |
+           Site.Name == "Frying Pan Mountain" |
+           Site.Name == "West Johnston Co." |
+           Site.Name == "Garinger High School" |
+           Site.Name == "Castle Hayne" |
+           Site.Name == "Pitt Agri. Center" |
+           Site.Name == "Bryson City" |
+           Site.Name == "Millbrook School") %>%
+  group_by(Date,Site.Name,AQS_PARAMETER_DESC,COUNTY) %>%
+  filter(!is.na(DAILY_AQI_VALUE) & !is.na(SITE_LATITUDE) & !is.na(SITE_LONGITUDE)) %>%
+  summarise(
+    mean_DAILY_AQI_VALUE = mean(DAILY_AQI_VALUE),
+    mean_SITE_LATITUDE = mean(SITE_LATITUDE),
+    mean_SITE_LONGITUDE = mean(SITE_LONGITUDE)) %>%
+  mutate(Air_Bind, Month = month(Date), Year = year(Date))
+  
 
 #9
 

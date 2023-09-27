@@ -43,22 +43,28 @@ library(here)
 #1b 
 
 #Check working directory
-setwd("C:/Users/dhr20/OneDrive - Duke University/1 - Academics/1 - First Year/1 - Fall 2023/2 - Environmental Data Exploration (872)/EDE_Fall2023")
 here()
+getwd() #QUESTION -- this is still outputting my working directory as the Assignments/4 - 04 folder versus the main project folder? I understand that here() is not affected by setwd() but it still doesn't seem to be resetting properly
+setwd(here())
 getwd() #QUESTION -- this is still outputting my working directory as the Assignments/4 - 04 folder versus the main project folder? I understand that here() is not affected by setwd() but it still doesn't seem to be resetting properly
 
 #1c 
 
-Air_O3_2018 <- read.csv("./Data/Raw/EPAair_O3_NC2018_raw.csv",
-                    stringsAsFactors = TRUE)
-Air_O3_2019 <- read.csv("./Data/Raw/EPAair_O3_NC2019_raw.csv",
-                   stringsAsFactors = TRUE)
-Air_PM25_2018 <- read.csv("./Data/Raw/EPAair_PM25_NC2018_raw.csv",
-                    stringsAsFactors = TRUE)
-Air_PM25_2019 <- read.csv("./Data/Raw/EPAair_PM25_NC2019_raw.csv",
-                   stringsAsFactors = TRUE)
+Air_O3_2018 <- read.csv(file = here('Data','Raw','EPAair_O3_NC2018_raw.csv'),
+                    stringsAsFactors = T)
+Air_O3_2019 <- read.csv(file = here('Data','Raw','EPAair_O3_NC2019_raw.csv'),
+                    stringsAsFactors = T)
+Air_PM25_2018 <- read.csv(file = here('Data','Raw','EPAair_PM25_NC2018_raw.csv'),
+                    stringsAsFactors = T)
+Air_PM25_2019 <- read.csv(file = here('Data','Raw','EPAair_PM25_NC2019_raw.csv'),
+                    stringsAsFactors = T)
 
 #2 
+
+glimpse(Air.O3.2018)
+glimpse(Air_O3_2019)
+glimpse(Air_PM25_2018)
+glimpse(Air_PM25_2019)
 
 ```
 
@@ -75,6 +81,8 @@ Air_PM25_2019 <- read.csv("./Data/Raw/EPAair_PM25_NC2019_raw.csv",
 
 ```{r}
 #3
+
+Air_O3_2018$Date <- as.Date(Air_O3_2018$Date, format = "%m/%d/%Y") #QUESTION -- what is the difference between doing this with lowercase versus capital case? Also, the order changes from mm/dd/yyyy to yyyy-mm-dd. Is that a problem?
 
 #4
 

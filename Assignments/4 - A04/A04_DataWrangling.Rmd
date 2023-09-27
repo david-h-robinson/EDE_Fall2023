@@ -88,7 +88,7 @@ Air_O3_2019$Date <- as.Date(Air_O3_2019$Date, format = "%m/%d/%Y") #QUESTION -- 
 
 Air_PM25_2018$Date <- as.Date(Air_PM25_2018$Date, format = "%m/%d/%Y") #QUESTION -- same as above.
 
-Air_O3_2019$Date <- as.Date(Air_O3_2019$Date, format = "%m/%d/%Y") #QUESTION -- same as above.
+Air_PM25_2019$Date <- as.Date(Air_PM25_2019$Date, format = "%m/%d/%Y") #QUESTION -- same as above.
 
 #4
 
@@ -104,9 +104,13 @@ Air_PM25_2019_Selection1 <- select(Air_PM25_2019, Date, DAILY_AQI_VALUE, Site.Na
 
 #QUESTION -- presumably this applies to the previously identified "selection" datasets?
 
-Air_PM25_2018_Selection1_replaced <- mutate(Air_PM25_2018_Selection1, AQS_PARAMETER_DESC = "PM2.5")
+Air_PM25_2018_Selection1_replaced <-
+  Air_PM25_2018_Selection1 %>%
+  mutate(AQS_PARAMETER_DESC = "PM2.5")
 
-Air_PM25_2019_Selection1_replaced <- mutate(Air_PM25_2019_Selection1, AQS_PARAMETER_DESC = "PM2.5")
+Air_PM25_2019_Selection1_replaced <-
+  Air_PM25_2019_Selection1 %>%
+  mutate(AQS_PARAMETER_DESC = "PM2.5")
 
 #6
 
@@ -146,13 +150,16 @@ write.csv(Air_PM25_2019_Selection1_replaced, row.names = FALSE, file = here('Dat
 
 #QUESTION -- presumably this applies to the four processed data sets?
 
+colnames(Air_O3_2018_Selection1)
+colnames(Air_O3_2019_Selection1)
+colnames(Air_PM25_2018_Selection1_replaced)
+colnames(Air_PM25_2019_Selection1_replaced)
+
 Air_Bind <- rbind(Air_O3_2018_Selection1, Air_O3_2019_Selection1, Air_PM25_2018_Selection1_replaced, Air_PM25_2019_Selection1_replaced)
 
 #8 
 
 Air_Bind_8 <- Air_Bind %>%
-  drop_na(Site.Name) %>% #QUESTION -- drop_na() vs droplevels()?
-  #QUESTION -- did not use 'intersect'?
   filter(Site.Name == "Linville Falls" |
            Site.Name == "Durham Armory" |
            Site.Name == "Leggett" |
@@ -167,13 +174,12 @@ Air_Bind_8 <- Air_Bind %>%
            Site.Name == "Bryson City" |
            Site.Name == "Millbrook School") %>%
   group_by(Date,Site.Name,AQS_PARAMETER_DESC,COUNTY) %>%
-  filter(!is.na(DAILY_AQI_VALUE) & !is.na(SITE_LATITUDE) & !is.na(SITE_LONGITUDE)) %>%
-  summarise(
+  summarize(
     mean_DAILY_AQI_VALUE = mean(DAILY_AQI_VALUE),
     mean_SITE_LATITUDE = mean(SITE_LATITUDE),
     mean_SITE_LONGITUDE = mean(SITE_LONGITUDE)) %>%
-  mutate(Air_Bind, Month = month(Date), Year = year(Date))
-  
+  mutate(Month = month(Date),
+         Year = year(Date))
 
 #9
 

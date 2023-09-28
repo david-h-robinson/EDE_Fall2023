@@ -197,7 +197,7 @@ dim(Air_Bind_8_spread9)
 
 #11
 
-#QUESTION -- this file has a different icon type than the other 4 processed files... is that okay for all 5 files?
+#QUESTION -- this file has a different icon type than the other 4 processed files... is that okay for all 5 files in the files pane?
 
 write.csv(Air_Bind_8_spread9, row.names = FALSE, file = here('Data','Processed','EPAair_O3_PM25_NC1819_Processed.csv'))
 
@@ -245,3 +245,4 @@ dim(Air_Bind_12_summary)
 
 > Answer: 
 'na.omit' removes the entire object associated with NAs anywhere, so it also applied to the column / field for PM2.5 when we only wanted it to apply to the column / field for Ozone. Testing na.omit resulted in 101 records instead of 182 for 'drop_na()'.
+QUESTION -- review this answer.

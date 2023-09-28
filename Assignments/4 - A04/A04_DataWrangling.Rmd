@@ -187,7 +187,8 @@ Air_Bind_8 <- Air_Bind %>%
 
 #9
 
-Air_Bind_8_spread9 <- pivot_wider(Air_Bind_8, names_from = AQS_PARAMETER_DESC, values_from = mean_DAILY_AQI_VALUE)
+Air_Bind_8_spread9 <- pivot_wider(Air_Bind_8, names_from = AQS_PARAMETER_DESC, values_from = AQS_PARAMETER_DESC)
+Air_Bind_8_spread9
 
 #10
 
@@ -219,8 +220,8 @@ write.csv(Air_Bind_8_spread9, row.names = FALSE, file = here('Data','Processed',
 Air_Bind_12_summary <- Air_Bind_8_spread9 %>%
   group_by(Site.Name,Month,Year) %>%
   summarize(
-    mean_DAILY_AQI_VALUE_Ozone = mean(Ozone),
-    mean_DAILY_AQI_VALUE_PM25 = mean(PM2.5)) %>%
+    mean_DAILY_AQI_VALUE_Ozone = mean(mean_DAILY_AQI_VALUE),
+    mean_DAILY_AQI_VALUE_PM25 = mean(mean_DAILY_AQI_VALUE)) %>%
       drop_na(mean_DAILY_AQI_VALUE_Ozone)
 
 #QUESTION -- for #14 -- see below
@@ -228,8 +229,8 @@ Air_Bind_12_summary <- Air_Bind_8_spread9 %>%
 Air_Bind_12_summary_TEST <- Air_Bind_8_spread9 %>%
   group_by(Site.Name,Month,Year) %>%
   summarize(
-    mean_DAILY_AQI_VALUE_Ozone = mean(Ozone),
-    mean_DAILY_AQI_VALUE_PM25 = mean(PM2.5)) %>%
+    mean_DAILY_AQI_VALUE_Ozone = mean(mean_DAILY_AQI_VALUE),
+    mean_DAILY_AQI_VALUE_PM25 = mean(mean_DAILY_AQI_VALUE)) %>%
       na.omit(mean_DAILY_AQI_VALUE_Ozone)
 
 #13

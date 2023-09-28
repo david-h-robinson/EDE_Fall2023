@@ -82,6 +82,8 @@ glimpse(Air_PM25_2019)
 ```{r 3-through-6}
 #3
 
+#QUESTION -- okay to not use lubridate ymd() here?
+
 Air_O3_2018$Date <- as.Date(Air_O3_2018$Date, format = "%m/%d/%Y") #QUESTION -- what is the difference between doing this with lowercase versus capital case? Also, the order changes from mm/dd/yyyy to yyyy-mm-dd. Is that a problem?
 
 Air_O3_2019$Date <- as.Date(Air_O3_2019$Date, format = "%m/%d/%Y") #QUESTION -- same as above.
@@ -159,6 +161,8 @@ Air_Bind <- rbind(Air_O3_2018_Selection1, Air_O3_2019_Selection1, Air_PM25_2018_
 
 #8 
 
+#QUESTION -- why don't we need drop_na() here?
+
 Air_Bind_8 <- Air_Bind %>%
   filter(Site.Name == "Linville Falls" |
            Site.Name == "Durham Armory" |
@@ -183,9 +187,19 @@ Air_Bind_8 <- Air_Bind %>%
 
 #9
 
+Air_Bind_8_spread9 <- pivot_wider(Air_Bind_8, names_from = AQS_PARAMETER_DESC, values_from = mean_DAILY_AQI_VALUE)
+
 #10
 
+#QUESTION -- is this all this question is asking?
+
+dim(Air_Bind_8_spread9) 
+
 #11
+
+#QUESTION -- this file has a different icon type than the other 4 processed files... is that okay for all 5 files?
+
+write.csv(Air_Bind_8_spread9, row.names = FALSE, file = here('Data','Processed','EPAair_O3_PM25_NC1819_Processed.csv'))
 
 ```
 
@@ -196,12 +210,33 @@ Air_Bind_8 <- Air_Bind %>%
 
 13. Call up the dimensions of the summary dataset.
 
-```{r}
+```{r 12-through-13}
 
 #12
 
+#QUESTION -- is it okay that this does not have a filter (split)?
+
+Air_Bind_12_summary <- Air_Bind_8_spread9 %>%
+  group_by(Site.Name,Month,Year) %>%
+  summarize(
+    mean_DAILY_AQI_VALUE_Ozone = mean(Ozone),
+    mean_DAILY_AQI_VALUE_PM25 = mean(PM2.5)) %>%
+      drop_na(mean_DAILY_AQI_VALUE_Ozone)
+
+#QUESTION -- for #14 -- see below
+
+Air_Bind_12_summary_TEST <- Air_Bind_8_spread9 %>%
+  group_by(Site.Name,Month,Year) %>%
+  summarize(
+    mean_DAILY_AQI_VALUE_Ozone = mean(Ozone),
+    mean_DAILY_AQI_VALUE_PM25 = mean(PM2.5)) %>%
+      na.omit(mean_DAILY_AQI_VALUE_Ozone)
 
 #13
+
+#QUESTION -- is this all this question is asking?
+
+dim(Air_Bind_12_summary)
 
 
 ```
@@ -209,3 +244,4 @@ Air_Bind_8 <- Air_Bind %>%
 14. Why did we use the function `drop_na` rather than `na.omit`?
 
 > Answer: 
+'na.omit' removes the entire object associated with NAs anywhere, so it also applied to the column / field for PM2.5 when we only wanted it to apply to the column / field for Ozone. Testing na.omit resulted in 101 records instead of 182 for 'drop_na()'.

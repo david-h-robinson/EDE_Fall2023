@@ -33,6 +33,8 @@ The completed exercise is due on Thursday, Sept 28th @ 5:00pm.
 ```{r setup, message = FALSE}
 #1a 
 
+#Load necessary packages
+
 #install.packages("tidyverse")
 library(tidyverse)
 #install.packages("lubridate")
@@ -42,13 +44,14 @@ library(here)
 
 #1b 
 
-#Check working directory
+#Check working directory #Please note decision to use 'here()' over 'getwd()' and 'setwd()'
+
 here()
-getwd() #QUESTION -- this is still outputting my working directory as the Assignments/4 - 04 folder versus the main project folder? I understand that here() is not affected by setwd() but it still doesn't seem to be resetting properly
-setwd(here())
-getwd() #QUESTION -- this is still outputting my working directory as the Assignments/4 - 04 folder versus the main project folder? I understand that here() is not affected by setwd() but it still doesn't seem to be resetting properly
+
 
 #1c 
+
+#Read in the data sets in question
 
 Air_O3_2018 <- read.csv(file = here('Data','Raw','EPAair_O3_NC2018_raw.csv'),
                     stringsAsFactors = T)
@@ -60,6 +63,8 @@ Air_PM25_2019 <- read.csv(file = here('Data','Raw','EPAair_PM25_NC2019_raw.csv')
                     stringsAsFactors = T)
 
 #2 
+
+#Apply 'glimpse()'
 
 glimpse(Air_O3_2018)
 glimpse(Air_O3_2019)
@@ -82,17 +87,20 @@ glimpse(Air_PM25_2019)
 ```{r 3-through-6}
 #3
 
-#QUESTION -- okay to not use lubridate ymd() here?
+#Change the Date columns to be date objects. Note decision to use 'as.Date()' but I
+#understand that 'lubridate()' would also have worked here and may be easier
 
-Air_O3_2018$Date <- as.Date(Air_O3_2018$Date, format = "%m/%d/%Y") #QUESTION -- what is the difference between doing this with lowercase versus capital case? Also, the order changes from mm/dd/yyyy to yyyy-mm-dd. Is that a problem?
+Air_O3_2018$Date <- as.Date(Air_O3_2018$Date, format = "%m/%d/%Y") 
 
-Air_O3_2019$Date <- as.Date(Air_O3_2019$Date, format = "%m/%d/%Y") #QUESTION -- same as above.
+Air_O3_2019$Date <- as.Date(Air_O3_2019$Date, format = "%m/%d/%Y") 
 
-Air_PM25_2018$Date <- as.Date(Air_PM25_2018$Date, format = "%m/%d/%Y") #QUESTION -- same as above.
+Air_PM25_2018$Date <- as.Date(Air_PM25_2018$Date, format = "%m/%d/%Y")
 
-Air_PM25_2019$Date <- as.Date(Air_PM25_2019$Date, format = "%m/%d/%Y") #QUESTION -- same as above.
+Air_PM25_2019$Date <- as.Date(Air_PM25_2019$Date, format = "%m/%d/%Y")
 
 #4
+
+#Select the columns in question
 
 Air_O3_2018_Selection1 <- select(Air_O3_2018, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 
@@ -104,7 +112,7 @@ Air_PM25_2019_Selection1 <- select(Air_PM25_2019, Date, DAILY_AQI_VALUE, Site.Na
 
 #5
 
-#QUESTION -- presumably this applies to the previously identified "selection" datasets?
+#Fill all cells in AQS_PARAMETER_DESC with "PM2.5"
 
 Air_PM25_2018_Selection1_replaced <-
   Air_PM25_2018_Selection1 %>%
@@ -116,13 +124,15 @@ Air_PM25_2019_Selection1_replaced <-
 
 #6
 
-write.csv(Air_O3_2018_Selection1, row.names = FALSE, file = here('Data','Processed','Air_O3_2018_processed'))
+#Save all four processed datasets in the Processed folder
 
-write.csv(Air_O3_2019_Selection1, row.names = FALSE, file = here('Data','Processed','Air_O3_2019_processed'))
+write.csv(Air_O3_2018_Selection1, row.names = FALSE, file = here('Data','Processed','Air_O3_2018_processed.csv'))
 
-write.csv(Air_PM25_2018_Selection1_replaced, row.names = FALSE, file = here('Data','Processed','Air_PM25_2018_processed'))
+write.csv(Air_O3_2019_Selection1, row.names = FALSE, file = here('Data','Processed','Air_O3_2019_processed.csv'))
 
-write.csv(Air_PM25_2019_Selection1_replaced, row.names = FALSE, file = here('Data','Processed','Air_PM25_2019_processed'))
+write.csv(Air_PM25_2018_Selection1_replaced, row.names = FALSE, file = here('Data','Processed','Air_PM25_2018_processed.csv'))
+
+write.csv(Air_PM25_2019_Selection1_replaced, row.names = FALSE, file = here('Data','Processed','Air_PM25_2019_processed.csv'))
 
 ```
 
@@ -150,18 +160,20 @@ write.csv(Air_PM25_2019_Selection1_replaced, row.names = FALSE, file = here('Dat
 ```{r 7-through-11}
 #7 
 
-#QUESTION -- presumably this applies to the four processed data sets?
+#Make sure column names are identical
 
 colnames(Air_O3_2018_Selection1)
 colnames(Air_O3_2019_Selection1)
 colnames(Air_PM25_2018_Selection1_replaced)
 colnames(Air_PM25_2019_Selection1_replaced)
 
+#Combine the four datasets
+
 Air_Bind <- rbind(Air_O3_2018_Selection1, Air_O3_2019_Selection1, Air_PM25_2018_Selection1_replaced, Air_PM25_2019_Selection1_replaced)
 
 #8 
 
-#QUESTION -- why don't we need drop_na() here?
+#Wrangle new dataset to fulfill the conditions in question
 
 Air_Bind_8 <- Air_Bind %>%
   filter(Site.Name == "Linville Falls" |
@@ -187,18 +199,20 @@ Air_Bind_8 <- Air_Bind %>%
 
 #9
 
-Air_Bind_8_spread9 <- pivot_wider(Air_Bind_8, names_from = AQS_PARAMETER_DESC, values_from = AQS_PARAMETER_DESC)
+#Spread your datasets such that AQI values for ozone and PM2.5 are in separate columns
+
+Air_Bind_8_spread9 <- pivot_wider(Air_Bind_8, names_from = AQS_PARAMETER_DESC, values_from = mean_DAILY_AQI_VALUE)
 Air_Bind_8_spread9
 
 #10
 
-#QUESTION -- is this all this question is asking?
+#Call up the dimensions of your new tidy dataset
 
 dim(Air_Bind_8_spread9) 
 
 #11
 
-#QUESTION -- this file has a different icon type than the other 4 processed files... is that okay for all 5 files in the files pane?
+#Save processed dataset
 
 write.csv(Air_Bind_8_spread9, row.names = FALSE, file = here('Data','Processed','EPAair_O3_PM25_NC1819_Processed.csv'))
 
@@ -215,27 +229,29 @@ write.csv(Air_Bind_8_spread9, row.names = FALSE, file = here('Data','Processed',
 
 #12
 
-#QUESTION -- is it okay that this does not have a filter (split)?
+#Use the split-apply-combine strategy to generate a summary data frame for the specified conditions
 
 Air_Bind_12_summary <- Air_Bind_8_spread9 %>%
   group_by(Site.Name,Month,Year) %>%
   summarize(
-    mean_DAILY_AQI_VALUE_Ozone = mean(mean_DAILY_AQI_VALUE),
-    mean_DAILY_AQI_VALUE_PM25 = mean(mean_DAILY_AQI_VALUE)) %>%
+    mean_DAILY_AQI_VALUE_Ozone = mean(Ozone),
+    mean_DAILY_AQI_VALUE_PM25 = mean(PM2.5)) %>%
       drop_na(mean_DAILY_AQI_VALUE_Ozone)
 
-#QUESTION -- for #14 -- see below
+Air_Bind_12_summary
 
-Air_Bind_12_summary_TEST <- Air_Bind_8_spread9 %>%
-  group_by(Site.Name,Month,Year) %>%
-  summarize(
-    mean_DAILY_AQI_VALUE_Ozone = mean(mean_DAILY_AQI_VALUE),
-    mean_DAILY_AQI_VALUE_PM25 = mean(mean_DAILY_AQI_VALUE)) %>%
-      na.omit(mean_DAILY_AQI_VALUE_Ozone)
+#Note for reviewer / TA -- the below code is written here for convenience as part of the answer to #14
+
+#Air_Bind_12_summary_TEST <- Air_Bind_8_spread9 %>%
+  #group_by(Site.Name,Month,Year) %>%
+  #summarize(
+    #mean_DAILY_AQI_VALUE_Ozone = mean(Ozone),
+    #mean_DAILY_AQI_VALUE_PM25 = mean(PM2.5)) %>%
+      #na.omit(mean_DAILY_AQI_VALUE_Ozone)
 
 #13
 
-#QUESTION -- is this all this question is asking?
+#Call up the dimensions of the summary dataset
 
 dim(Air_Bind_12_summary)
 
@@ -245,5 +261,4 @@ dim(Air_Bind_12_summary)
 14. Why did we use the function `drop_na` rather than `na.omit`?
 
 > Answer: 
-'na.omit' removes the entire object associated with NAs anywhere, so it also applied to the column / field for PM2.5 when we only wanted it to apply to the column / field for Ozone. Testing na.omit resulted in 101 records instead of 182 for 'drop_na()'.
-QUESTION -- review this answer.
+'na.omit' removes the entire object associated with NAs anywhere, so it also applied to the column / field for PM2.5 (and presumably other fields within the data frame) when we only wanted it to apply to the column / field for Ozone. Testing na.omit resulted in 101 records instead of 182 for 'drop_na()'. We used 'drop_na()' because we wanted to focus on a single column versus the entire data frame.

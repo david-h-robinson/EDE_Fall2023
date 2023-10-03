@@ -32,6 +32,9 @@ This exercise accompanies the lessons in Environmental Data Analytics on Data Vi
 
 ```{r initialize project}
 #1 
+
+#Load necessary packages
+
 #install.packages("tidyverse")
 library(tidyverse)
 #install.packages("lubridate")
@@ -42,6 +45,12 @@ library(here)
 library(cowplot)
 
 #2 
+
+#Read in the data sets in question
+
+Nutrients <- read.csv(file = here('Data','Processed_KEY', 'NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv'), stringsAsFactors = T)
+
+Litter <- read.csv(file = here('Data','Processed_KEY', 'NEON_NIWO_Litter_mass_trap_Processed.csv'), stringsAsFactors = T)
 
 ```
 ## Define your theme
@@ -55,6 +64,14 @@ library(cowplot)
 ```{r build plot theme}
 #3
 
+#Customized axis label size
+#Customized axis label color
+#Customized label position
+
+mytheme <- theme_classic(base_size = 15) +
+  theme(axis.text = element_text(color = "blue"), 
+        legend.position = "bottom")
+
 ```
 
 ## Create graphs
@@ -64,6 +81,8 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 
 ```{r plot total P vs PO4}
 #4 
+
+
 
 ```
 
@@ -76,6 +95,8 @@ Tip:
 
 ```{r Create boxplots}
 #5 
+
+
 
 ```
 
@@ -91,7 +112,11 @@ Question: What do you observe about the variables of interest over seasons and b
 #6
 
 
+
+
 #7
+
+
 
 
 ```

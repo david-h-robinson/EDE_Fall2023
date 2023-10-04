@@ -85,6 +85,9 @@ mytheme <- theme_base() +
     )
   )
 
+#RUN THIS LATER
+#theme_set(mytheme)
+
 #QUESTION -- figure out what to do with the below
 
     #line =              element_line(),
@@ -125,6 +128,7 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 
 #QUESTION -- how to apply 'mytheme' here?
 #QUESTION -- what does 'separate aesthetics' mean here? Is color sufficient? Also need to change the shape of the points?
+#QUESTION -- dropna() here?
 
 ggplot(Nutrients,
        aes(
@@ -137,7 +141,7 @@ ggplot(Nutrients,
   #QUESTION -- this doesn't work
   #scale_shape_manual(values = c(15, 17)) +
   xlim(0, 150) +
-  ylim(0, 150) +
+  ylim(0, 50) +
   geom_smooth(method= lm, color = "black")
 
 
@@ -155,23 +159,36 @@ Tip:
 
 #QUESTION -- how to apply mytheme here?
 
+#QUESTION -- dropna() here?
+
+Nutrients_droppedNAs <- Nutrients %>%
+  drop_na(temperature_C) %>%
+  drop_na(tp_ug) %>%
+  drop_na(tn_ug)
+
 boxplot_temp <- ggplot(Nutrients,
-       aes(x = month,
+       aes(x = factor(month,levels = 1:12, labels = month.abb),
            y = temperature_C
            )) +
-         geom_boxplot(aes(color = lakename))
+         geom_boxplot(aes(color = lakename)) +
+  labs(x = "Month")
+#boxplot_temp
+
+#QUESTION -- Why does this result in multiple empty months?
 
 boxplot_TP <- ggplot(Nutrients,
-       aes(x = month,
+       aes(x = factor(month,levels = 1:12, labels = month.abb),
            y = tp_ug
            )) +
-         geom_boxplot(aes(color = lakename))
+         geom_boxplot(aes(color = lakename)) +
+  labs(x = "Month")
 
 boxplot_TN <- ggplot(Nutrients,
-       aes(x = month,
+       aes(x = factor(month,levels = 1:12, labels = month.abb),
            y = tn_ug
            )) +
-         geom_boxplot(aes(color = lakename))
+         geom_boxplot(aes(color = lakename)) +
+  labs(x = "Month")
 
 #QUESTION -- the below counts as a 'cowplot that combines the three graphs', correct?
 #QUESTION -- did not use factors per tip
@@ -179,11 +196,13 @@ boxplot_TN <- ggplot(Nutrients,
 #QUESTION -- is the replication of month along the bottom an issue?
 #QUESTION -- axes are aligned but number scales are not the same -- adjust?
 
+#UPDATE -- need more than two plots per chart?
+
 plot_grid(boxplot_temp + ylab(NULL) + theme(legend.position = 'none'),
           boxplot_TP + ylab(NULL) + theme(legend.position = 'none'),
           boxplot_TN + ylab(NULL) + theme(legend.position = 'none'),
           get_legend(boxplot_temp), #+ theme(legend.position = 'bottom'),
-          nrow = 1, 
+          ncol = 1,  #QUESTION -- ncol versus nrow here -- see below
           align = 'vh', 
           labels = c('Temp', 'TP', 'TN'), 
           axis = 'b')
@@ -193,7 +212,7 @@ plot_grid(boxplot_temp + ylab(NULL) + theme(legend.position = 'none'),
 Question: What do you observe about the variables of interest over seasons and between lakes? 
 
 > Answer: 
-x
+#QUESTION -- how can the charts be best compared? Should they be aligned vertically?
 
 6. [Niwot Ridge] Plot a subset of the litter dataset by displaying only the "Needles" functional group. Plot the dry mass of needle litter by date and separate by NLCD class with a color aesthetic. (no need to adjust the name of each land use)
 
@@ -204,14 +223,37 @@ x
 
 #QUESTION -- how to apply mytheme here?
 
+Litter_needles <- Litter %>%
+  filter(functionalGroup == "Needles")
+
+ggplot(Litter_needles,
+       aes(
+         y = dryMass,
+         x = collectDate,
+         color = nlcdClass
+       )
+       ) +
+  geom_point()
+
+#QUESTION -- how to clean up x-axis?
+
 
 #7
 
 #QUESTION -- how to apply mytheme here?
+
+ggplot(Litter_needles,
+       aes(
+         y = dryMass,
+         x = collectDate
+       )
+       ) +
+  geom_point() +
+  facet_wrap(vars(nlcdClass))
 
 
 ```
 Question: Which of these plots (6 vs. 7) do you think is more effective, and why? 
 
 > Answer:
-x
+#QUESTION -- how can the charts be best compared? Should they be aligned vertically?

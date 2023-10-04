@@ -153,6 +153,8 @@ Tip:
 ```{r Create boxplots}
 #5 
 
+#QUESTION -- how to apply mytheme here?
+
 boxplot_temp <- ggplot(Nutrients,
        aes(x = month,
            y = temperature_C
@@ -200,12 +202,12 @@ x
 ```{r Plot litter}
 #6
 
-
+#QUESTION -- how to apply mytheme here?
 
 
 #7
 
-
+#QUESTION -- how to apply mytheme here?
 
 
 ```

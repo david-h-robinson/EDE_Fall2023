@@ -49,11 +49,11 @@ library(ggthemes)
 #2 
 
 #Read in the data sets in question
+
 Nutrients <- read.csv(file = here('Data','Processed_KEY', 'NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv'), stringsAsFactors = T)
 
 Litter <- read.csv(file = here('Data','Processed_KEY', 'NEON_NIWO_Litter_mass_trap_Processed.csv'), stringsAsFactors = T)
 
-#Make sure R is reading the dates as date format
 Nutrients$sampledate <- ymd(Nutrients$sampledate)
 Litter$collectDate <- ymd(Litter$collectDate)
 
@@ -69,31 +69,55 @@ Litter$collectDate <- ymd(Litter$collectDate)
 ```{r build plot theme}
 #3
 
-#Customize axis ticks / gridlines
-#Customize legend
-#Customize background fill
+#Customized axis label size
+#Customized axis label color
+#Customized label position
+
 mytheme <- theme_base() +
   theme(
     line = element_line(
       color = 'blue',
-      linewidth = 1
+      linewidth = 3
     ),
     legend.background = element_rect(
       color = 'black',
+      fill = 'red'
     ),
     legend.title = element_text(
-      color = 'purple'
-    ),
-    axis.text = element_text(
-      size = 10
-    ),
-    plot.background = element_rect(
-      color = 'grey', fill = 'grey'
-    ))
+      color = 'orange'
+    )
+  )
 
-#Apply / set the theme that was just defined
-theme_set(mytheme)
+#TO DO -- RUN THIS LATER
+#theme_set(mytheme)
 
+#QUESTION -- figure out what to do with the below
+
+    #line =              element_line(),
+    #rect =              element_rect(),
+    #text =              element_text(),
+    
+    # Modified inheritance structure of text element
+    #plot.title =        element_text(),
+    #axis.title.x =      element_blank(),
+    #axis.title.y =      element_blank(),
+    #axis.text =         element_text(),
+    
+    # Modified inheritance structure of line element
+    #axis.ticks =        element_line(),
+    #panel.grid.major =  element_line(),
+    #panel.grid.minor =  element_blank(),
+    
+    # Modified inheritance structure of rect element
+    #plot.background =   element_rect(),
+    #panel.background =  element_rect(),
+    #legend.key =        element_rect(),
+    
+    # Modifiying legend.position
+    #legend.position = 'right',
+    
+    #complete = TRUE
+    #)
 
 ```
 
@@ -105,7 +129,10 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 ```{r plot total P vs PO4}
 #4 
 
-#Create scatter plot of TP by PO4 per the instructions
+#TO DO -- apply 'mytheme' here?
+#QUESTION -- what does 'separate aesthetics' mean here? Is color sufficient? Also need to change the shape of the points?
+#QUESTION -- dropna() here? ggplot does this 
+
 ggplot(Nutrients,
        aes(
          y = po4,
@@ -114,10 +141,13 @@ ggplot(Nutrients,
        )
        ) +
   geom_point() +
+  #QUESTION -- this doesn't work
+  #scale_shape_manual(values = c(15, 17)) +
   xlim(0, 150) +
   ylim(0, 50) +
-  geom_smooth(method= lm, color = "black") + 
-  labs(y = 'PO4', x = 'TP', color = 'Lake Name')
+  geom_smooth(method= lm, color = "black")
+
+#QUESTION -- does it matter what type of line of best fit we use here?
 
 
 ```
@@ -132,17 +162,19 @@ Tip:
 ```{r Create boxplots}
 #5 
 
-#Create boxplot for temperature per the instructions -- note the legend is positioned for the
-#later get_legend() call in the cowplot
+#TO DO -- apply 'mytheme' here?
+
 boxplot_temp <- ggplot(Nutrients,
        aes(x = factor(month,levels = 1:12, labels = month.abb),
            y = temperature_C
            )) +
          geom_boxplot(aes(color = lakename)) +
-  labs(y = 'Temperature', x = '', color = 'Lake Name') +
+  labs(y = 'Temperature', x = '', color = 'Lake Name')+
   theme(legend.position='bottom')
+boxplot_temp
 
-#Create boxplot for TP per the instructions
+#TO DO -- relabel axes and legends with non-column names -- could remove month
+
 boxplot_TP <- ggplot(Nutrients,
        aes(x = factor(month,levels = 1:12, labels = month.abb),
            y = tp_ug
@@ -150,7 +182,6 @@ boxplot_TP <- ggplot(Nutrients,
          geom_boxplot(aes(color = lakename)) +
   labs(y = "TP", x = "")
 
-#Create boxplot for TN per the instructions
 boxplot_TN <- ggplot(Nutrients,
        aes(x = factor(month,levels = 1:12, labels = month.abb),
            y = tn_ug
@@ -158,7 +189,9 @@ boxplot_TN <- ggplot(Nutrients,
          geom_boxplot(aes(color = lakename)) +
   labs(y = "TN",x = "")
 
-#Create cowplot to align the three boxplots
+#QUESTION -- is the replication of month along the bottom an issue?
+#QUESTION -- axes are aligned but number scales are not the same -- adjust?
+
 plot_grid(boxplot_temp + theme(legend.position = 'none'),
           boxplot_TP + theme(legend.position = 'none'),
           boxplot_TN + theme(legend.position = 'none'),
@@ -173,7 +206,7 @@ plot_grid(boxplot_temp + theme(legend.position = 'none'),
 Question: What do you observe about the variables of interest over seasons and between lakes? 
 
 > Answer: 
-Over seasons, temperatures tend to fluctuate as we might expect -- in alignment with air temperatures (warmer in the summer months, cooler in the spring and fall months). TP and TN are pretty similar across seasons. Between lakes, Paul Lake has higher median temperatures than Peter Lake. Paul Lake has lower median values than Peter Lake of both TP and TN across all seasons.
+#QUESTION -- how can the charts be best compared? Should they be aligned vertically?
 
 6. [Niwot Ridge] Plot a subset of the litter dataset by displaying only the "Needles" functional group. Plot the dry mass of needle litter by date and separate by NLCD class with a color aesthetic. (no need to adjust the name of each land use)
 
@@ -182,11 +215,12 @@ Over seasons, temperatures tend to fluctuate as we might expect -- in alignment 
 ```{r Plot litter}
 #6
 
-#Filter the dataset per the instructions
+#TO DO -- apply 'mytheme' here?
+#TO DO -- relabel axes and legends with non-column names
+
 Litter_needles <- Litter %>%
   filter(functionalGroup == "Needles")
 
-#Create scatterplot per the instructions
 ggplot(Litter_needles,
        aes(
          y = dryMass,
@@ -200,7 +234,9 @@ ggplot(Litter_needles,
 
 #7
 
-#Create scatterplot per the instructions including facets by NLCD Class 
+#TO DO -- apply 'mytheme' here?
+#TO DO -- relabel axes and legends with non-column names
+
 ggplot(Litter_needles,
        aes(
          y = dryMass,
@@ -216,4 +252,4 @@ ggplot(Litter_needles,
 Question: Which of these plots (6 vs. 7) do you think is more effective, and why? 
 
 > Answer:
-I think the plot on #7 is more effective -- the facets by NLCD Class enable an easier digestion of the data rather than colors by data point given the large number of data points.
+#QUESTION -- how can the charts be best compared? Should they be aligned vertically?

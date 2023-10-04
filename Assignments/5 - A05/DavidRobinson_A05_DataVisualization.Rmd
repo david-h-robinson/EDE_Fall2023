@@ -49,9 +49,11 @@ library(ggthemes)
 #2 
 
 #Read in the data sets in question
-Nutrients <- read.csv(file = here('Data','Processed_KEY', 'NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv'), stringsAsFactors = T)
+Nutrients <- read.csv(file = here('Data','Processed_KEY', 'NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv'),
+                      stringsAsFactors = T)
 
-Litter <- read.csv(file = here('Data','Processed_KEY', 'NEON_NIWO_Litter_mass_trap_Processed.csv'), stringsAsFactors = T)
+Litter <- read.csv(file = here('Data','Processed_KEY', 'NEON_NIWO_Litter_mass_trap_Processed.csv'),
+                   stringsAsFactors = T)
 
 #Make sure R is reading the dates as date format
 Nutrients$sampledate <- ymd(Nutrients$sampledate)
@@ -132,8 +134,8 @@ Tip:
 ```{r Create boxplots}
 #5 
 
-#Create boxplot for temperature per the instructions -- note the legend is positioned for the
-#later get_legend() call in the cowplot
+#Create boxplot for temperature per the instructions -- note the legend is
+#positioned for the later get_legend() call in the cowplot
 boxplot_temp <- ggplot(Nutrients,
        aes(x = factor(month,levels = 1:12, labels = month.abb),
            y = temperature_C

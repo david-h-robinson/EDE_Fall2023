@@ -47,19 +47,13 @@ library(agricolae)
 here()
 
 #Import relevant data files
-Lake <- read.csv(here("Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv"), 
-                 stringsAsFactors = TRUE)
+Lake <- read.csv(here("Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv"), stringsAsFactors = TRUE)
 Lake$sampledate <- as.Date(Lake$sampledate,format = "%m/%d/%Y")
 
 #2
 
-mytheme <- theme_classic(base_size = 14) +
-  theme(axis.text = element_text(color = "black"),
-        legend.position = "top",
-        legend.title = element_text(size = 6),
-        legend.text = element_text(size = 6)
-        )
-theme_set(mytheme)
+#QUESTION -- do this later -- could just recycle theme from A05
+#See 13:56 from video 1
 
 
 ```
@@ -101,8 +95,7 @@ ggplot(Lake_wrangled,
   ylim(0,35) +
   geom_smooth(method = lm) +
   labs(y = "Temperature (C)",
-       x = "Depth",
-       title = "Temperature (C) vs. Depth")
+       x = "Depth")
 
 
 ```
@@ -218,8 +211,7 @@ ggplot(Lake_wrangled,
   geom_smooth(method = lm, se = FALSE) +
   labs(y = "Temperature (C)",
        x = "Depth",
-       color = "Lake Name",
-       title = "Temperature (C) vs. Depth")
+       color = "Lake Name")
 
 
 ```

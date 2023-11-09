@@ -2,6 +2,8 @@
 title: "Assignment 9: Spatial Analysis in R"
 author: "David Robinson"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## OVERVIEW
@@ -34,12 +36,12 @@ library(sf)
 #install.packages('leaflet')
 library(leaflet)
 #install.packages('mapview')
-library(mapview)
+library(mapview); mapviewOptions(fgb = FALSE)
 #install.packages('here')
 library(here)
 
 #Disable on-the-fly projections
-#sf::sf_use_s2(FALSE)
+sf::sf_use_s2(FALSE)
 
 #2. 
 
@@ -59,8 +61,9 @@ In this exercise, we will be exploring stream gage height data in Nebraska corre
 ```{r Read the county data into an sf dataframe}
 #3. Read in Counties shapefile into an sf dataframe, filtering for just NE counties
 
+#QUESTION -- is this supposed to be NE or NC? If NE, how do we know which # to use?
 counties_sf_1 <- st_read(here('Data/Spatial/cb_2018_us_county_20m.shp')) %>%
-  filter(STATEFP == 37)
+  filter(STATEFP == 31)
 
 
 #4. Reveal the CRS of the counties features
@@ -70,19 +73,27 @@ st_crs(counties_sf_1)
 
 #5. Plot the data
 
+#QUESTION -- pick one of these -- does it matter which one?
+
 mapView(counties_sf_1)
 
-ggplot(data=counties_sf_1) + geom_sf()
-
-#ggplot() +
- # geom_sf(data=counties_sf)
+ggplot() +
+  geom_sf(data=counties_sf_1)
 
 ```
 
 6. What is the EPSG code of the Counties dataset? Is this a geographic or a projected coordinate reference system? (Or, does this CRS use angular or planar coordinate units?) To what datum is this CRS associated? (Tip: look for the EPSG code on <https://spatialreference.org> and examine the link for "Well Known Text as HTML" or "Human-Readable OGC WKT"...)
 
 > ANSWER: 
-> 
+> ID["EPSG",4269]]
+so this uses EPSG code 4269
+The CRS uses angular and geographic.
+
+> DATUM["North American Datum 1983",
+    ELLIPSOID["GRS 1980",6378137,298.257222101,
+        LENGTHUNIT["metre",1]]],
+so this CRS is associated with "North American Datum 1983"
+>
 
 
 ### Read in gage locations csv as a dataframe, then display the column names it contains
@@ -96,17 +107,23 @@ Next we'll read in some USGS/NWIS gage location data added to the `Data/Raw` fol
 ```{r Read in USGS Gage Locations}
 #7. Read in gage locations csv as a dataframe
 
-#I think this is where you want to use the 'colClasses' bit of code
+#QUESTION -- I think this is where you want to use the 'colClasses' bit of code
+#QUESTION -- do I want to just use stringsAsfactors = TRUE?
+
+NWIS_df <- read.csv(here('Data/Raw/NWIS_SiteInfo_NE_RAW.csv'),
+                         colClasses = c('site_no' = 'factor'))
 
 
 #8. Reveal the names of the columns
+
+colnames(NWIS_df)
 
 
 ```
 
 9. What columns in the dataset contain the x and y coordinate values, respectively?  
 > ANSWER:
-> 
+> x coordinate values are in "dec_long_va" and y coordinate values are in "dec_lat_va"
 
 
 ### Convert the dataframe to a spatial features ("sf") dataframe
@@ -119,9 +136,14 @@ Next we'll read in some USGS/NWIS gage location data added to the `Data/Raw` fol
 ```{r Convert dataframe to sf dataframe}
 #10. Convert to an sf object
 
+NWIS_sf <- NWIS_df %>%
+  st_as_sf(coords = c('dec_long_va', 'dec_lat_va'),
+           crs = 4269)
+
 
 #11. Re-examine the column names
 
+colnames(NWIS_sf)
 
 ```
 
@@ -129,7 +151,8 @@ Next we'll read in some USGS/NWIS gage location data added to the `Data/Raw` fol
 
 >ANSWER: 
 >
-
+New fields that appeared = "geometry"
+Fields that disappeared = dec_lat_va" and "dec_long_va"
 
 ### Plot the gage locations on top of the counties
 
@@ -140,6 +163,12 @@ Next we'll read in some USGS/NWIS gage location data added to the `Data/Raw` fol
 
 ```{r Plot the spatial features}
 #13. Plot the gage locations atop the county features
+
+#QUESTION -- this looks weird; check columns used when converting from csv to 
+#spatial dataframe?
+
+ggplot() +
+  geom_sf(data=counties_sf_1, color = 'blue') + geom_sf(data=NWIS_sf, color = 'red') + labs(title = "NWIS Gage Locations in Nebraska", subtitle = "David Robinson")
 
 
 ```
@@ -161,17 +190,32 @@ Lastly, we want to attach some gage height data to our site locations. I've cons
 ```{r Read in gage site data}
 #14. Read the site flow data into a data frame
 
+#QUESTION -- similar question as above here -- how to know which fields should be imported as factors?
+NWIS_SiteFlow_df = read.csv(here('Data/Raw/NWIS_SiteFlowData_NE_RAW.csv'),
+                         colClasses = c('site_no' = 'factor'))
+
 
 #15. Show the column names
+
+colnames(NWIS_SiteFlow_df)
 
 
 #16. Join the flow data to our NWIS gage location spatial dataframe
 
+NWIS_join <- merge(x = NWIS_sf,
+                   y = NWIS_SiteFlow_df,
+                   by = "site_no")
+
+#QUESTION -- this clearly is not right -- is this a class thing?
 
 #17. Show the column names of the joined dataset
 
+colnames(NWIS_join)
+
 
 #18. Show the dimensions of this joined dataset
+
+dim(NWIS_join)
 
 
 ```
@@ -184,6 +228,13 @@ Now we can examine where the flooding appears most acute by visualizing gage hei
 
 ```{r map gage sites}
 #Map the points, sized by gage height
+
+#QUESTION -- error here re: geometry
+
+ggplot() +
+  geom_sf(data=counties_sf_1, color = 'blue') +
+  geom_sf(data=NWIS_join, aes(color = gage_ht)) +
+  scale_color_gradient(low="yellow", high="darkgreen")
 
 
 ```
@@ -203,8 +254,15 @@ Up next we will do some spatial analysis with our data. To prepare for this, we 
 ```{r spatial analysis}
 #20 Transform the counties and gage location datasets to UTM Zone 14
 
+counties_sf_1_utm <- st_transform(counties_sf_1, crs = 32614)
+
+NWIS_sf_utm <- st_transform(NWIS_sf, crs = 32614)
+
 
 #21 Plot the data
+
+ggplot() +
+  geom_sf(data=counties_sf_1_utm, color = 'blue') + geom_sf(data=NWIS_sf_utm, color = 'red')
 
 
 ```
@@ -224,12 +282,23 @@ Now let's zoom into a particular county and examine the gages located there.
 ```{r spatial selection}
 #22 Select the county
 
+counties_sf_1_Dawson <- counties_sf_1_utm %>%
+  filter(NAME == 'Dawson')
+
+#QUESTION -- this is only one record?
+
 
 #23 Spatially select gages within the selected county
+
+counties_sf_1_Dawson_gages <- NWIS_sf_utm[counties_sf_1_Dawson,]
 
 
 #24 Plot
 
+ggplot() +
+  geom_sf(data=counties_sf_1_utm, color = 'blue') +
+  geom_sf(data=counties_sf_1_Dawson, color = 'red') +
+  geom_sf(data=counties_sf_1_Dawson_gages)
 
 
 ```

@@ -46,6 +46,7 @@ Indicate this website as the as the URL to be scraped. (In other words, read the
 ```{r set.the.scraping.website}
 #2 
 
+#Indicate website as URL to be scraped
 webpage <- read_html('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2022')
 webpage
 
@@ -68,27 +69,23 @@ In the code chunk below scrape these values, assigning them to four separate var
 ```{r scrape.the.data}
 #3 
 
+#Scrape values and assign to four separate variables
 the_water_system_name <- webpage %>%
   html_nodes("div+ table tr:nth-child(1) td:nth-child(2)") %>%
   html_text()
-the_water_system_name
 
 the_PWSID <- webpage %>%
   html_nodes("td tr:nth-child(1) td:nth-child(5)") %>%
   html_text()
-the_PWSID
 
 the_ownership <- webpage %>%
   html_nodes("div+ table tr:nth-child(2) td:nth-child(4)") %>%
   html_text()
-the_ownership
 
 the_MGD <- webpage %>%
   html_nodes("th~ td+ td") %>%
   html_text()
-the_MGD
 
-#QUESTION -- does the order of the months need to be modified later?
 
 ```
 
@@ -104,25 +101,22 @@ the_MGD
 ```{r create.a.dataframe.from.scraped.data}
 #4 
 
-the_months <- c("Jan", "May", "Sept", "Feb", "Jun", "Oct", "Mar", "Jul", "Nov", "Apr", "Aug", "Dec")
-the_years <- c("2022", "2022", "2022", "2022", "2022", "2022", "2022", "2022", "2022", "2022", "2022", "2022")
+#Create list of months in order the data was scraped
+the_months = c("Jan", "May", "Sep", "Feb", "Jun", "Oct", "Mar", "Jul", "Nov", "Apr", "Aug", "Dec")
 
+#Convert scraped data into a dataframe
 df_withdrawals <- data.frame("Month" = the_months,
-                             "Year" = the_years,
-                             "Avg_Withdrawals_mgd" = as.numeric(the_MGD))
-df_withdrawals
-
-df_withdrawals_full <- df_withdrawals %>%
+                             "Year" = rep(2022,12),
+                             "Avg_Withdrawals_mgd" = as.numeric(the_MGD)) %>%
   mutate(Water_System_Name = !!the_water_system_name,
          PWSID = !!the_PWSID,
          Ownership = !!the_ownership,
          Date = my(paste(Month,"-",Year)))
 
-df_withdrawals_full
-
 #5 
 
-ggplot(df_withdrawals_full,aes(x=Date,y=Avg_Withdrawals_mgd)) + 
+#Create line plot
+ggplot(df_withdrawals,aes(x=Date,y=Avg_Withdrawals_mgd)) + 
   geom_line() + 
   geom_smooth(method="loess",se=FALSE) +
   labs(title = paste("2022 Water usage data for",the_ownership),
@@ -130,7 +124,6 @@ ggplot(df_withdrawals_full,aes(x=Date,y=Avg_Withdrawals_mgd)) +
        y="Withdrawal (mgd)",
        x="Date")
 
-#QUESTION -- are these months in the right order or does something need to happen to sort them?
 
 ```
 
@@ -139,35 +132,26 @@ ggplot(df_withdrawals_full,aes(x=Date,y=Avg_Withdrawals_mgd)) +
 ```{r construct.a.scraping.function}
 #6. 
 
-the_base_url <- 'https://www.ncwater.org/WUDC/app/LWSP/report'
+#Construct function
+scrape.it <- function(the_PWSID_var, the_year_var){
+  the_base_url <- 'https://www.ncwater.org/WUDC/app/LWSP/report'
 'https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2022'
-the_PWSID_var <- '03-32-010'
-the_year_var <- 2022
+
 the_scrape_url <- paste0(the_base_url, '.php?pwsid=', the_PWSID_var, '&year=', the_year_var)
 print(the_scrape_url)
-
-#QUESTION -- is this saying now to copy / paste most of 2. - 5. to complete the function, or is the above sufficient?
 
 #Retrieve the website contents
 webpage_var <- read_html(the_scrape_url)
 webpage_var
 
 #Set the element address variables (determined in the previous step)
-the_water_system_name_tag <- webpage_var %>%
-  html_nodes("div+ table tr:nth-child(1) td:nth-child(2)") %>%
-  html_text()
+the_water_system_name_tag <- 'div+ table tr:nth-child(1) td:nth-child(2)'
 
-the_PWSID_tag <- webpage_var %>%
-  html_nodes("td tr:nth-child(1) td:nth-child(5)") %>%
-  html_text()
+the_PWSID_tag <- 'td tr:nth-child(1) td:nth-child(5)'
 
-the_ownership_tag <- webpage_var %>%
-  html_nodes("div+ table tr:nth-child(2) td:nth-child(4)") %>%
-  html_text()
+the_ownership_tag <- 'div+ table tr:nth-child(2) td:nth-child(4)'
 
-the_MGD_tag <- webpage_var %>%
-  html_nodes("th~ td+ td") %>%
-  html_text()
+the_MGD_tag <- 'th~ td+ td'
 
 #Scrape the data items
 the_water_system_name_var <- webpage_var %>%
@@ -188,22 +172,16 @@ the_MGD_var <- webpage_var %>%
 
 #Construct a dataframe from the scraped data
 df_withdrawals_var <- data.frame("Month" = the_months,
-                             "Year" = the_years,
+                             "Year" = rep(the_year_var, 12),
                              "Avg_Withdrawals_mgd" = as.numeric(the_MGD_var)) %>%
-df_withdrawals_var_full <- df_withdrawals_var %>%
   mutate(Water_System_Name = !!the_water_system_name_var,
          PWSID = !!the_PWSID_var,
          Ownership = !!the_ownership_var,
          Date = my(paste(Month,"-",Year)))
 
-#Plot
-ggplot(df_withdrawals_var,aes(x=Date,y=Avg_Withdrawals_mgd)) + 
-  geom_line() + 
-  geom_smooth(method="loess",se=FALSE) +
-  labs(title = paste("2022 Water usage data for",the_ownership_var),
-       subtitle = the_water_system_name_var,
-       y="Withdrawal (mgd)",
-       x="Date")
+return(df_withdrawals_var)
+}
+
 
 ```
 
@@ -212,7 +190,16 @@ ggplot(df_withdrawals_var,aes(x=Date,y=Avg_Withdrawals_mgd)) +
 ```{r fetch.and.plot.Durham.2015.data}
 #7 
 
-#QUESTION -- look back into function syntax from A02 or A03
+#Use function to extract
+df_7 <- scrape.it('03-32-010',2015)
+
+#Plot
+ggplot(df_7,aes(x=Date,y=Avg_Withdrawals_mgd)) + 
+  geom_line() + 
+  geom_smooth(method="loess",se=FALSE) +
+  labs(title = paste("2022 Water usage data"),
+       y="Withdrawal (mgd)",
+       x="Date")
 
 
 ```
@@ -222,7 +209,17 @@ ggplot(df_withdrawals_var,aes(x=Date,y=Avg_Withdrawals_mgd)) +
 ```{r fetch.and.plot.Asheville.2015.data}
 #8 
 
+#Use function to extract
+df_8 <- scrape.it('01-11-010',2015)
 
+#Combine data frames
+df_combined <- rbind(df_8, df_7)
+
+#Plot
+ggplot(data = df_combined,
+       aes(x=Date, y=Avg_Withdrawals_mgd, color = Water_System_Name)) + 
+  geom_line() +
+  labs(y = "Avg Withdrawals (mgd)", color = "Water System Name")
 
 
 ```
@@ -235,11 +232,24 @@ ggplot(df_withdrawals_var,aes(x=Date,y=Avg_Withdrawals_mgd)) +
 ```{r fetch.and.plot.Asheville.multiyear.data }
 #9 
 
+#Create list of years
+list_of_years <- c(2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021)
+list_of_PWSIDs <- rep('01-11-010',12)
 
+#Iteratively run function and combine data frames
+dfs_2021 <- map2(list_of_PWSIDs, list_of_years, scrape.it) %>%
+  bind_rows()
+
+#Plot
+ggplot(data = dfs_2021,
+       aes(x=Date, y=Avg_Withdrawals_mgd)) + 
+  geom_line() +
+  geom_smooth(method="loess",se=FALSE) 
+  labs(y = "Avg Withdrawals (mgd)")
 
 
 ```
 
 Question: Just by looking at the plot (i.e. not running statistics), does Asheville have a trend in water usage over time?
 > Answer:
->
+> Yes, there is a gradual trend of increased water usage over time (the trendline moves up and to the right).

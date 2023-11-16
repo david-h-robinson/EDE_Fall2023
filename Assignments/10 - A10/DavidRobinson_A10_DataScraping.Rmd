@@ -26,6 +26,13 @@ This exercise accompanies the lessons in Environmental Data Analytics on data sc
 ```{r 1. Project Setup, message = FALSE}
 #1 
 
+#install.packages("tidyverse")
+library(tidyverse)
+#install.packages("rvest")
+library(rvest)
+#install.packages("here")
+library(here); here()
+
 
 ```
 
@@ -38,6 +45,9 @@ Indicate this website as the as the URL to be scraped. (In other words, read the
 
 ```{r set.the.scraping.website}
 #2 
+
+webpage <- read_html('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2022')
+webpage
 
 ```
 
@@ -58,6 +68,28 @@ In the code chunk below scrape these values, assigning them to four separate var
 ```{r scrape.the.data}
 #3 
 
+the_water_system_name <- webpage %>%
+  html_nodes("div+ table tr:nth-child(1) td:nth-child(2)") %>%
+  html_text()
+the_water_system_name
+
+the_PWSID <- webpage %>%
+  html_nodes("td tr:nth-child(1) td:nth-child(5)") %>%
+  html_text()
+the_PWSID
+
+the_ownership <- webpage %>%
+  html_nodes("div+ table tr:nth-child(2) td:nth-child(4)") %>%
+  html_text()
+the_ownership
+
+the_MGD <- webpage %>%
+  html_nodes("th~ td+ td") %>%
+  html_text()
+the_MGD
+
+#QUESTION -- does the order of the months need to be modified later?
+
 ```
 
 
@@ -72,7 +104,33 @@ In the code chunk below scrape these values, assigning them to four separate var
 ```{r create.a.dataframe.from.scraped.data}
 #4 
 
+the_months <- c("Jan", "May", "Sept", "Feb", "Jun", "Oct", "Mar", "Jul", "Nov", "Apr", "Aug", "Dec")
+the_years <- c("2022", "2022", "2022", "2022", "2022", "2022", "2022", "2022", "2022", "2022", "2022", "2022")
+
+df_withdrawals <- data.frame("Month" = the_months,
+                             "Year" = the_years,
+                             "Avg_Withdrawals_mgd" = as.numeric(the_MGD))
+df_withdrawals
+
+df_withdrawals_full <- df_withdrawals %>%
+  mutate(Water_System_Name = !!the_water_system_name,
+         PWSID = !!the_PWSID,
+         Ownership = !!the_ownership,
+         Date = my(paste(Month,"-",Year)))
+
+df_withdrawals_full
+
 #5 
+
+ggplot(df_withdrawals_full,aes(x=Date,y=Avg_Withdrawals_mgd)) + 
+  geom_line() + 
+  geom_smooth(method="loess",se=FALSE) +
+  labs(title = paste("2022 Water usage data for",the_ownership),
+       subtitle = the_water_system_name,
+       y="Withdrawal (mgd)",
+       x="Date")
+
+#QUESTION -- are these months in the right order or does something need to happen to sort them?
 
 ```
 
@@ -81,6 +139,71 @@ In the code chunk below scrape these values, assigning them to four separate var
 ```{r construct.a.scraping.function}
 #6. 
 
+the_base_url <- 'https://www.ncwater.org/WUDC/app/LWSP/report'
+'https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2022'
+the_PWSID_var <- '03-32-010'
+the_year_var <- 2022
+the_scrape_url <- paste0(the_base_url, '.php?pwsid=', the_PWSID_var, '&year=', the_year_var)
+print(the_scrape_url)
+
+#QUESTION -- is this saying now to copy / paste most of 2. - 5. to complete the function, or is the above sufficient?
+
+#Retrieve the website contents
+webpage_var <- read_html(the_scrape_url)
+webpage_var
+
+#Set the element address variables (determined in the previous step)
+the_water_system_name_tag <- webpage_var %>%
+  html_nodes("div+ table tr:nth-child(1) td:nth-child(2)") %>%
+  html_text()
+
+the_PWSID_tag <- webpage_var %>%
+  html_nodes("td tr:nth-child(1) td:nth-child(5)") %>%
+  html_text()
+
+the_ownership_tag <- webpage_var %>%
+  html_nodes("div+ table tr:nth-child(2) td:nth-child(4)") %>%
+  html_text()
+
+the_MGD_tag <- webpage_var %>%
+  html_nodes("th~ td+ td") %>%
+  html_text()
+
+#Scrape the data items
+the_water_system_name_var <- webpage_var %>%
+  html_nodes(the_water_system_name_tag) %>%
+  html_text()
+
+the_PWSID_var <- webpage_var %>%
+  html_nodes(the_PWSID_tag) %>%
+  html_text()
+
+the_ownership_var <- webpage_var %>%
+  html_nodes(the_ownership_tag) %>%
+  html_text()
+
+the_MGD_var <- webpage_var %>%
+  html_nodes(the_MGD_tag) %>%
+  html_text()
+
+#Construct a dataframe from the scraped data
+df_withdrawals_var <- data.frame("Month" = the_months,
+                             "Year" = the_years,
+                             "Avg_Withdrawals_mgd" = as.numeric(the_MGD_var)) %>%
+df_withdrawals_var_full <- df_withdrawals_var %>%
+  mutate(Water_System_Name = !!the_water_system_name_var,
+         PWSID = !!the_PWSID_var,
+         Ownership = !!the_ownership_var,
+         Date = my(paste(Month,"-",Year)))
+
+#Plot
+ggplot(df_withdrawals_var,aes(x=Date,y=Avg_Withdrawals_mgd)) + 
+  geom_line() + 
+  geom_smooth(method="loess",se=FALSE) +
+  labs(title = paste("2022 Water usage data for",the_ownership_var),
+       subtitle = the_water_system_name_var,
+       y="Withdrawal (mgd)",
+       x="Date")
 
 ```
 
@@ -89,6 +212,8 @@ In the code chunk below scrape these values, assigning them to four separate var
 ```{r fetch.and.plot.Durham.2015.data}
 #7 
 
+#QUESTION -- look back into function syntax from A02 or A03
+
 
 ```
 
@@ -96,6 +221,8 @@ In the code chunk below scrape these values, assigning them to four separate var
 
 ```{r fetch.and.plot.Asheville.2015.data}
 #8 
+
+
 
 
 ```
@@ -107,6 +234,8 @@ In the code chunk below scrape these values, assigning them to four separate var
 
 ```{r fetch.and.plot.Asheville.multiyear.data }
 #9 
+
+
 
 
 ```
